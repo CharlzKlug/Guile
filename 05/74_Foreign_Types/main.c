@@ -55,3 +55,20 @@ SCM make_image(SCM name, SCM s_width, SCM s_height) {
      object, and return that object. */
   return scm_make_foreign_object_1(image_type, image);
 }
+
+SCM clear_image(SCM image_obj) {
+  int area;
+  struct image *image;
+
+  scm_assert_foreign_object_type(image_type, image_obj);
+
+  image = scm_foreign_object_ref(image_obj, 0);
+  area = image->width * image->height;
+  memset(image->pixels, 0, area);
+
+  /* Invoke the image's update function. */
+  if (scm_is_true (image->update_func))
+    scm_call_0(image->update_func);
+
+  return SCM_UNSPECIFIED;
+}
