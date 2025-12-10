@@ -2,6 +2,7 @@
    (pkg-config --libs guile-3.0) */
 #include <libguile.h>
 #include <string.h> // For `memset`.
+#include <unistd.h> // For `close`.
 
 struct image {
   int width, height;
@@ -77,6 +78,31 @@ SCM clear_image (SCM image_obj) {
     scm_call_0 (image->update_func);
 
   return SCM_UNSPECIFIED;
+}
+
+static SCM file_type;
+
+static void finalize_file (SCM file) {
+  int fd = scm_foreign_object_signed_ref (file, 0);
+  if (fd >= 0) {
+    scm_foreign_object_signed_set_x (file, 0, -1);
+    close (fd);
+  }
+}
+
+static void init_file_type (void) {
+  SCM name, slots;
+  scm_t_struct_finalize finalizer;
+
+  name = scm_from_utf8_symbol ("file");
+  slots = scm_list_1 (scm_from_utf8_symbol ("fd"));
+  finalizer = finalize_file;
+
+  image_type = scm_make_foreign_object_type (name, slots, finalizer);
+}
+
+static SCM make_file (int fd) {
+  return scm_make_foreign_object_1 (file_type, (void *) fd);
 }
 
 int main() {
