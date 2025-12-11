@@ -44,12 +44,11 @@ int main() {
   scm_init_guile();
   init_foo_data_type();
   init_get_val_from_foo_data();
-  SCM some_data = make_foo_data(scm_from_utf8_symbol("bar"), scm_from_int(34));
+  SCM some_data = make_foo_data(scm_from_utf8_symbol("bar"), scm_from_int(79));
   SCM bim = scm_from_int(42);
-  /* scm_eval_string (scm_from_utf8_string ("(display bim)")); */
-  /* scm_call_1(scm_variable_ref("display"), bim); */
+  scm_primitive_load(scm_from_utf8_string
+                     ("/home/user/projects/Guile/Appendix/"
+                      "02_Foreign_Object/auxiliary.scm"));
 
-  SCM func_symbol = scm_c_lookup("display");
-  SCM func = scm_variable_ref(func_symbol);
-  scm_call_1(func, bim);
+  scm_call_1(scm_variable_ref(scm_c_lookup("print-foo-data-val")), some_data);
 }
