@@ -7,19 +7,17 @@
 #include <libguile.h>
 #include <stdlib.h>
 
-/* static SCM my_hostname(void) { */
-SCM_DEFINE (my_hostname, "my-hostname", 0, 0, 0,
-            SCM, "Print hostname.") {
-  char *s = getenv("HOSTNAME");
-  if (s == NULL)
-    return SCM_BOOL_F;
-  else
-    return scm_from_locale_string(s);
+SCM_DEFINE(my_add, "my-add", 2, 0, 0,
+           (SCM a, SCM b),
+           "Return the sum of A and B."
+           )
+{
+  return scm_sum(a, b);
 }
 
 static void inner_main(void *data, int argc, char **argv) {
   /* scm_c_define_gsubr("my-hostname", 0, 0, 0, my_hostname); */
-  #include "image-type.x"
+  /* #include "image-type.x" */
   scm_shell(argc, argv);
 }
 
